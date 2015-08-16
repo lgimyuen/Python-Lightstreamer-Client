@@ -3,7 +3,8 @@
 ## Introduction
 This project is a Lightstreamer Client written in Python.
 
-
+## Dependency
+This package depends on Python-requests `http://www.python-requests.org/`
 
 
 
