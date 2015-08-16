@@ -12,14 +12,14 @@ This package depends on Python-requests `http://www.python-requests.org/`
 This example is a simple stock quote demo which connect to the `DEMO` adapter_set at `https://push.lightstreamer.com:443` and subscribe to the `QUOTE_ADAPTER`. Press Enter to quit.
 ```python
 from lightstreamer.lightstreamer import *
+import pprint as pp
 
-class Api:
-    def prepare_data(self, context, data):
+class Context:
+    def prepare_data(self, data):
         pp.pprint(data)
 
-GenericObj = type('GenericObj', (object,), {})
-context = GenericObj()
-context.api = Api()
+
+context = Context()
 
 
 BASE_URL = 'https://push.lightstreamer.com:443'
@@ -86,7 +86,7 @@ MaxBandwidth:0.0
 ## Usage
 
 ### Create Lightstreamer Object
-Instantiate the Lightstreamer Object. No connection is made. Context is a generic object class that you can pass in. It must contain a function `context.api.prepare_data(context, data)`. Context object and the data receive from the data stream will be passed to this function.
+Instantiate the Lightstreamer Object. No connection is made. Context is a generic object class that you can pass in. It must contain a function `context.prepare_data(data)`. Context object and the data receive from the data stream will be passed to this function.
 ```python
 client = LSClient(url, user_id, password, context=[])
 ```
@@ -98,7 +98,7 @@ client.create_session(adapter_set)
 ```
 
 ### Lightstreamer Streaming Thread
-Create a python thread to stream data. When data is received, pass it to `context.api.prepare_data(context, data)`.
+Create a python thread to stream data. When data is received, pass it to `context.prepare_data(data)`.
 Upon errors such as connection timeout, etc, the program will automatically call `bind_session`. If `bind_session` fails,
 the program will automatically call `create_session()` and a new thread will be created.
 ```python 

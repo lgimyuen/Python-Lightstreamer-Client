@@ -50,7 +50,8 @@ class LSClient:
                                             lightstreamer from create_session
         table_count         : [integer]     count number of table
         table_id            : [list]        Table ID list
-        context             : [object]      a generic Context object for interaction with data
+        context             : [object]      a generic Context object for interaction with data,
+                                            it must implement context.prepare_data(data)
         subscription_param  : [List]        List of Dictionary of Subscription param
         _stream_r            : [response]    response stream from Requests
         adapter_set         : [string]      the lightstreamer adapter_set
@@ -68,10 +69,10 @@ class LSClient:
     def __init__(self, url, uid, password, context=[]):
         """
 
-        :param url:
-        :param uid:
-        :param password:
-        :param context:
+        :param url: URL
+        :param uid: username
+        :param password: password
+        :param context: context object. It must contain context.prepare_data(context, data)
         :return:
         """
         self.uid = uid
@@ -147,7 +148,7 @@ class LSClient:
                             data[schema_item] = info[counter]
                         data["_tableIdx_"] = table_no
                         data["_itemNo_"] = item_no
-                        self.context.api.prepare_data(self.context, data)
+                        self.context.prepare_data(data)
                 if not receive:
                     break
         except:
@@ -162,7 +163,6 @@ class LSClient:
             else:
                 print("Thread: " + threading.current_thread().name + " fail to bind...")
                 is_recreate = True
-
 
         print("Thread: " + threading.current_thread().name + " trying to recreate...")
         while is_recreate:
@@ -328,16 +328,14 @@ class LSClient:
 
         return is_ok
 
-if __name__ == "__main__":
 
-    class Api:
-        def prepare_data(self, context, data):
+if __name__ == "__main__":
+    class Context:
+        def prepare_data(self, data):
             pp.pprint(data)
 
-    GenericObj = type('GenericObj', (object,), {})
-    context = GenericObj()
-    context.api = Api()
 
+    context = Context()
 
     BASE_URL = 'https://push.lightstreamer.com:443'
 
@@ -362,4 +360,3 @@ if __name__ == "__main__":
     raw_input('Hit any key to exit')
 
     client.destroy_session()
-
